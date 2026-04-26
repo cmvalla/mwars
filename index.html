@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplication Wars</title>
+    <meta name="description" content="Un gioco spaziale per imparare le tabelline in modo divertente e veloce.">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui-layer">
+            <div id="top-bar">
+                <div class="stat">SCORE: <span id="scoreValue">0</span></div>
+                <div id="current-operation-display" style="font-size: 2rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px #00f3ff; text-align: center; margin: 0 10px;"></div>
+                <div class="stat">
+                    INTEGRITÀ: 
+                    <div id="health-bar"><div id="health-fill"></div></div>
+                </div>
+            </div>
+            <div id="start-screen" class="screen active">
+                <h1>MULTIPLICATION WARS</h1>
+                <p>Difendi la galassia risolvendo le moltiplicazioni!</p>
+                <div class="controls-info">
+                    <p>🖥️ <strong>PC:</strong> Usa ⬅️ ➡️ per muoverti, SPAZIO per sparare.</p>
+                    <p>📱 <strong>Mobile:</strong> Trascina per muoverti, tocca per sparare.</p>
+                </div>
+                <div class="table-selection">
+                    <p>Seleziona le tabelline attive:</p>
+                    <div id="table-toggles">
+                        <!-- Toggles generati via JS -->
+                    </div>
+                </div>
+                <div class="alien-selection" style="margin-bottom: 20px;">
+                    <p>Pilota alieno:</p>
+                    <div id="alien-toggles" style="display: flex; gap: 10px; justify-content: center; font-size: 2rem;"></div>
+                </div>
+                <button id="start-btn">INIZIA MISSIONE</button>
+                <button id="show-leaderboard-btn" style="margin-top: 15px; font-size: 1rem; padding: 10px 20px; border-radius: 15px;">🏆 WALL OF FAME 🏆</button>
+            </div>
+            <div id="game-over-screen" class="screen">
+                <h1>MISSIONE FALLITA</h1>
+                <p>Punteggio Finale: <span id="final-score">0</span></p>
+                <div id="new-highscore-box" style="display: none; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+                    <p style="color: gold; font-weight: bold; margin-bottom: 10px;">🌟 Punteggio Epico! Entri nella Wall of Fame! 🌟</p>
+                    <input type="text" id="player-name" placeholder="Inserisci il tuo nome..." maxlength="15" style="padding: 10px; margin-bottom: 10px; border-radius: 5px; font-family: 'Orbitron'; font-size: 1rem; border: none; outline: none; text-align: center;">
+                    <button id="submit-score-btn" style="font-size: 1rem; padding: 10px 20px;">INVIA</button>
+                </div>
+                <button id="restart-btn">RIPROVA</button>
+            </div>
+            
+            <div id="planet-screen" class="screen">
+                <h1 style="font-size: 2.5rem; color: #00ffaa;">NUOVO PIANETA!</h1>
+                <p>Hai risolto 100 moltiplicazioni! Hai trovato un nuovo amico:</p>
+                <div id="new-alien-display" style="font-size: 6rem; margin: 20px; text-shadow: 0 0 20px rgba(0,255,170,0.5);">👽</div>
+                <button id="planet-continue-btn">TORNA ALLA BASE</button>
+            </div>
+
+            <div id="leaderboard-screen" class="screen">
+                <h1 style="color: gold; text-shadow: 0 0 15px gold;">🏆 WALL OF FAME 🏆</h1>
+                <div id="leaderboard-list" style="width: 80%; max-width: 400px; max-height: 50vh; overflow-y: auto; margin-bottom: 20px; background: rgba(0,0,0,0.5); border: 1px solid gold; border-radius: 10px; padding: 15px;">
+                    <p style="text-align:center; color:#aaa;">Caricamento classifica...</p>
+                </div>
+                <button id="leaderboard-close-btn" style="font-size: 1rem; padding: 10px 20px;">CHIUDI</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
