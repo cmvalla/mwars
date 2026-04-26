@@ -22,6 +22,20 @@ gameContainer.appendChild(bonusFlash);
 let width, height;
 let gameLoopId;
 let isPlaying = false;
+let isPaused = false;
+
+function togglePause() {
+    isPaused = !isPaused;
+    if (isPaused) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = '#00f3ff';
+        ctx.font = 'bold 50px Orbitron';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('PAUSA', width/2, height/2);
+    }
+}
 
 // Game State
 let score = 0;
@@ -57,10 +71,13 @@ const keys = {
 };
 
 window.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape') {
+        if (isPlaying) togglePause();
+    }
     if (e.code === 'ArrowLeft') keys.ArrowLeft = true;
     if (e.code === 'ArrowRight') keys.ArrowRight = true;
     if (e.code === 'Space') {
-        if (isPlaying && !keys.Space) {
+        if (isPlaying && !keys.Space && !isPaused) {
             player.shoot();
         }
         keys.Space = true;
@@ -89,7 +106,7 @@ canvas.addEventListener('touchstart', (e) => {
 }, {passive: true});
 
 canvas.addEventListener('touchmove', (e) => {
-    if (!isPlaying) return;
+    if (!isPlaying || isPaused) return;
     const touchX = e.touches[0].clientX;
     const touchY = e.touches[0].clientY;
     
@@ -108,12 +125,27 @@ canvas.addEventListener('touchmove', (e) => {
     if (player.x > width - player.width/2) player.x = width - player.width/2;
 }, {passive: true});
 
+let lastTapTime = 0;
+
 canvas.addEventListener('touchend', (e) => {
     if (!isPlaying) return;
-    const touchDuration = Date.now() - touchStartTime;
-    // Se è un tap veloce e senza movimento significativo, spara
+    const currentTime = Date.now();
+    const touchDuration = currentTime - touchStartTime;
+    const timeSinceLastTap = currentTime - lastTapTime;
+    
+    // Se è un tap veloce e senza movimento significativo
     if (!hasMoved && touchDuration < 300) {
-        player.shoot();
+        if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
+            // Doppio tap
+            togglePause();
+            lastTapTime = 0;
+        } else {
+            // Tap singolo
+            if (!isPaused) {
+                player.shoot();
+            }
+            lastTapTime = currentTime;
+        }
     }
 }, {passive: true});
 
@@ -136,6 +168,34 @@ function resize() {
     
     if (player && player.y > height - player.height - 80) {
         player.y = height - player.height - 80;
+    }
+
+    if (isPlaying && isPaused) {
+        // Redraw current frame
+        ctx.fillStyle = '#050510';
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = '#fff';
+        stars.forEach(star => {
+            ctx.globalAlpha = Math.random() * 0.5 + 0.5;
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size, 0, Math.PI*2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1.0;
+        
+        if (player) player.draw();
+        bullets.forEach(b => b.draw());
+        enemies.forEach(e => e.draw());
+        particles.forEach(p => p.draw());
+        
+        // Redraw pause overlay
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = '#00f3ff';
+        ctx.font = 'bold 50px Orbitron';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('PAUSA', width/2, height/2);
     }
 }
 
@@ -765,6 +825,11 @@ function drawBackground() {
 function loop() {
     if (!isPlaying) return;
     
+    if (isPaused) {
+        gameLoopId = requestAnimationFrame(loop);
+        return;
+    }
+    
     timePassed++;
     
     drawBackground();
@@ -818,6 +883,7 @@ function startGame() {
     startScreen.classList.remove('active');
     gameOverScreen.classList.remove('active');
     isPlaying = true;
+    isPaused = false;
     
     if (gameLoopId) cancelAnimationFrame(gameLoopId);
     gameLoopId = requestAnimationFrame(loop);

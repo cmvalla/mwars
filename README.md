@@ -8,6 +8,8 @@ Multiplication Wars è un gioco educativo in formato web che unisce l'apprendime
 * **Supporto Mobile**: Controlli ottimizzati per smartphone e tablet.
   * **Trascina** (Drag) lo schermo per muovere l'astronave.
   * **Tocca** (Tap) per sparare un laser quando l'astronave è allineata con l'operazione che vuoi colpire.
+  * **Doppio Tocca** (Double Tap) per mettere il gioco in pausa o riprenderlo.
+* **Supporto Desktop**: Usa le frecce per muoverti, **Spazio** per sparare e **ESC** per mettere in pausa.
 * **Difficoltà Progressiva**: La velocità dei nemici inizia lentamente e aumenta progressivamente man mano che procedi.
 * **Personalizzazione**: Scegli quali tabelline allenare (da 1 a 10) tramite il menu di configurazione a inizio partita.
 
