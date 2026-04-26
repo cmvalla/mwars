@@ -369,38 +369,62 @@ class Player {
             if (consecutiveCorrect >= 30) bulletColor = '#b9f2ff';
             else if (consecutiveCorrect >= 10) bulletColor = '#ffd700';
 
-            let b = new Bullet(this.x, this.y - this.height/2);
-            b.color = bulletColor;
+            let b = new Bullet(this.x, this.y - this.height/2, bulletColor);
             bullets.push(b);
             
             this.cooldown = 15; // Rate of fire limit
-            createParticles(this.x, this.y - this.height/2, bulletColor, 5, 2);
         }
     }
 }
 
 class Bullet {
-    constructor(x, y) {
+    constructor(x, y, color) {
         this.x = x;
-        this.y = y;
-        this.width = 4;
-        this.height = 20;
-        this.speed = 15;
-        this.color = '#00f3ff';
+        this.y = y; // Start point (player tip)
+        this.width = 6;
+        this.color = color;
+        this.life = 10; // Frames the beam is visible
         this.markedForDeletion = false;
+        
+        // Immediate collision check
+        for (let j = enemies.length - 1; j >= 0; j--) {
+            const e = enemies[j];
+            if (e.y < this.y && Math.abs(this.x - e.x) < e.radius + this.width/2) {
+                if (e.isCorrect) {
+                    createParticles(e.x, e.y, '#00ff11', 40, 3);
+                    applyBonus();
+                    generateQuestion(); // Reset immediato e nuova ondata
+                } else {
+                    createParticles(e.x, e.y, '#ff003c', 20, 2);
+                    e.markedForDeletion = true; 
+                    applyMalus("SBAGLIATO!");
+                }
+                break;
+            }
+        }
+        
+        // Create particles at the origin
+        createParticles(this.x, this.y, this.color, 5, 2);
     }
 
     update() {
-        this.y -= this.speed;
-        if (this.y < 0) this.markedForDeletion = true;
+        this.life--;
+        if (this.life <= 0) this.markedForDeletion = true;
     }
 
     draw() {
         ctx.save();
-        ctx.shadowBlur = 10;
+        ctx.globalAlpha = this.life / 10;
+        ctx.shadowBlur = 15;
         ctx.shadowColor = this.color;
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.x - this.width/2, this.y, this.width, this.height);
+        // The beam goes from the top of the screen (y=0) to the player (this.y)
+        ctx.fillRect(this.x - this.width/2, 0, this.width, this.y);
+        
+        // Add a core white beam for a cooler effect
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowBlur = 5;
+        ctx.fillRect(this.x - this.width/4, 0, this.width/2, this.y);
         ctx.restore();
     }
 }
@@ -689,29 +713,7 @@ function updateUI() {
 }
 
 function checkCollisions() {
-    for (let i = bullets.length - 1; i >= 0; i--) {
-        const b = bullets[i];
-        for (let j = enemies.length - 1; j >= 0; j--) {
-            const e = enemies[j];
-            
-            const dist = Math.hypot(b.x - e.x, b.y - e.y);
-            
-            if (dist < e.radius + b.width/2) {
-                b.markedForDeletion = true;
-                
-                if (e.isCorrect) {
-                    createParticles(e.x, e.y, '#00ff11', 40, 3);
-                    applyBonus();
-                    generateQuestion(); // Reset immediato e nuova ondata
-                } else {
-                    createParticles(e.x, e.y, '#ff003c', 20, 2);
-                    e.markedForDeletion = true; 
-                    applyMalus("SBAGLIATO!");
-                }
-                break; // Il proiettile è distrutto, passiamo al prossimo
-            }
-        }
-    }
+    // Collisione proiettili-nemici rimossa perché il laser è istantaneo e gestita alla sua creazione
     
     for (let i = enemies.length - 1; i >= 0; i--) {
         const e = enemies[i];
