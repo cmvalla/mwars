@@ -463,11 +463,19 @@ class Enemy {
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation);
         
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = this.color;
+        // Controlla se il giocatore è allineato (larghezza raggio laser = 6, quindi metà è 3)
+        let displayColor = this.color;
+        let isTargeted = player && (this.y < player.y) && Math.abs(player.x - this.x) < this.radius + 3;
+        
+        if (isTargeted) {
+            displayColor = '#00f3ff'; // Colore azzurro quando è sotto tiro
+        }
+
+        ctx.shadowBlur = isTargeted ? 25 : 15;
+        ctx.shadowColor = displayColor;
         
         // Forma da asteroide/cristallo (esagono irregolare)
-        ctx.strokeStyle = this.color;
+        ctx.strokeStyle = displayColor;
         ctx.lineWidth = 3;
         ctx.fillStyle = 'rgba(20, 0, 30, 0.8)';
         ctx.beginPath();
